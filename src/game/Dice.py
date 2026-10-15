@@ -1,11 +1,11 @@
 import random
 
-from Sides import EmptySide, EggSide, ChickenSide, FoxSide
+from game.Side import Side, EmptySide, EggSide, ChickenSide, FoxSide
 
 
 class Dice:
     """A class that defines how a general die works in the game Chicken!"""
-    def __init__(self, num_sides: int, chicken: list[int], foxes: list[int], eggs: list[int]):
+    def __init__(self, num_sides: int, chicken: list[int], foxes: list[int], eggs: list[int]) -> None:
         """
         We expect chicken, foxes, and eggs to be list of ints containing the quantity values of each of the
         sides.
@@ -30,18 +30,18 @@ class Dice:
         for i in range(num_empty):
             self.sides.append(EmptySide())
 
-    def get_num_sides(self):
-        return self.get_num_sides
+    def get_num_sides(self) -> int:
+        return self.num_sides
 
-    def get_sides(self):
+    def get_sides(self) -> list[Side]:
         return self.sides
 
-    def roll(self):
+    def roll(self) -> Side:
         return random.choice(self.sides)
 
 
 class WhiteDice(Dice):
-    def __init__(self):
+    def __init__(self) -> None:
         chicken = [1, 1]
         eggs = [1, 1]
         foxes = [1]
@@ -49,7 +49,7 @@ class WhiteDice(Dice):
         super().__init__(num_sides=6, chicken=chicken, foxes=foxes, eggs=eggs)
 
 class YellowDice(Dice):
-    def __init__(self):
+    def __init__(self) -> None:
         chicken = [1, 1, 1]
         eggs = [1]
         foxes = [1]
@@ -57,7 +57,7 @@ class YellowDice(Dice):
         super().__init__(num_sides=6, chicken=chicken, foxes=foxes, eggs=eggs)
 
 class OrangeDice(Dice):
-    def __init__(self):
+    def __init__(self) -> None:
         chicken = [2, 1]
         eggs = []
         foxes = [1, 1]
