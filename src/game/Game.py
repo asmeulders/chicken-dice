@@ -1,6 +1,6 @@
 from Dice import Dice, WhiteDice, YellowDice, OrangeDice
 from Player import Player
-from Hand import Hand
+from Hand import Hand, EmptyHand
 
 def Game():
     """
@@ -17,9 +17,9 @@ def Game():
     total_die, current_die, current_chicken, current_fox, player_order, active_player, 
     turn, 
     """
-    def __init__(self, goal: int, num_players: int, die: list[Dice]) -> None:
+    def __init__(self, goal: int, num_players: int, die: list[Dice], num_die: int) -> None:
         """
-        die is a list of unique types of die
+        die is a list of unique types of die in order of rank (0 is lowest and goes in hand first)
         num_die = die per unique type
         check die rank for ordering
         """
@@ -28,31 +28,22 @@ def Game():
 
         self.num_players = num_players
         self.initialize_players()
-        self.active_player = 0
+        self.active_player = None
         self.die = die
-        self.active_die = []
+        self.num_die = num_die
+        self.num_total_die = len(die) * num_die
+        self.initialize_rank_dict(die)
+        self.hand = Hand([])
 
-    def initialize_players(self):
-        self.players = []
-        for i in range(self.num_players):
-            self.players.append(Player(i))
-
-    def initialize_hand():
-        pass
+    # =================================================================
+    # ------- Accessors -----------------------------------------------
+    # =================================================================
 
     def get_turn(self) -> int:
         return self.turn
 
     def get_goal(self) -> int:
         return self.goal
-
-    def game_over(self) -> bool:
-        """Returns true if the game is over, false if not."""
-        for p in self.players:
-            if p.get_score() >= self.get_goal():
-                return True
-            
-        return False
 
     def get_num_players(self) -> int:
         return self.num_players
@@ -63,10 +54,77 @@ def Game():
     def get_die(self) -> list[Dice]:
         return self.die
 
-    def end_turn(self):
-        self.turn += 1
-        self.active_player = (self.active_player + 1) % self.num_players
-        self.players[self.active_player].set_hand(Hand(self.die))
+    # =================================================================
+    # ------- Mutators ------------------------------------------------
+    # =================================================================
+
+    def initialize_players(self):
+        self.players = []
+        for i in range(self.num_players):
+            self.players.append(Player(i))
+
+    def initialize_rank_dict(self, die):
+        self.rank_dict = {
+            dice.get_rank(): {
+                "num_die": 0,
+                "dice": dice
+            } for dice in die
+        }
+    
+    def initialize_hand(self):
+        """
+        rank_dict = {
+            {rank}: {
+                num_die: # in hand for this type,
+                dice: dice object
+            }
+        }
+        """
+        for rank, num_die in self.rank_dict.items():
+            for _ in range(num_die):
+                if not self.hand.add_dice(self.rank_dict[rank]["dice"]):
+                    raise Exception("Dice was not added")
+
+        
+
+    # =================================================================
+    # ------- Game Functions ------------------------------------------
+    # =================================================================
 
     def start_game(self):
-        pass
+        self.reset_die() # resets the rank_dict and initializes the hand
+        self.start_turn() # set first active player and give them their hand
+
+    def reset_die(self):
+        """
+        Reset the rank_dict and initialize the hand.
+        """
+        self.reset_rank_dict()
+        self.initialize_hand()
+
+    def reset_rank_dict(self):
+        self.rank_dict[0]["num_die"] = self.num_die
+        num_ranks = self.num_total_die / self.num_die
+        for rank in range(1, num_ranks):
+            self.rank_dict[rank]["num_die"] = 0
+
+    def start_turn(self):
+        if not self.active_player:
+            self.active_player = 0
+
+        self.players[self.active_player].set_hand(self.hand)
+
+    def end_turn(self):
+        self.players[self.active_player].set_hand(EmptyHand)
+        self.turn += 1
+        self.active_player = (self.active_player + 1) % self.num_players
+        
+
+    def game_over(self) -> bool:
+        """Returns true if the game is over, false if not."""
+        for p in self.players:
+            if p.get_score() >= self.get_goal():
+                return True
+            
+        return False
+    

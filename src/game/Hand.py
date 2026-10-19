@@ -14,6 +14,14 @@ class Hand():
             results.append(d.roll())
         return results
 
+    def add_dice(self, dice: Dice) -> bool:
+        """Returns true if dice was added, false if not."""
+        try:
+            self.die.append(dice)
+            return True
+        except ValueError:
+            return False
+
     def remove_dice(self, dice: Dice) -> bool:
         """Returns true if dice was removed, false if not."""
         try:
@@ -21,6 +29,22 @@ class Hand():
             return True
         except ValueError:
             return False
+
+    def __len__(self):
+        return len(self.die)
+
+    def __eq__(self, other):
+        if not isinstance(other, Hand):
+            return NotImplemented
+        if len(self) != len(other):
+            return False
+        for i, dice in enumerate(self.die):
+            if not dice == other.get_die()[i]:
+                return False
+            
+        return True
+            
+
 
 
 class EmptyHand(Hand):
