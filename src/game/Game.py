@@ -18,16 +18,27 @@ def Game():
     turn, 
     """
     def __init__(self, goal: int, num_players: int, die: list[Dice]) -> None:
+        """
+        die is a list of unique types of die
+        num_die = die per unique type
+        check die rank for ordering
+        """
         self.turn = 0
         self.goal = goal
 
         self.num_players = num_players
-        players: list[Player] = []
-        for i in range(num_players):
-            players.append(Player(i))
-        self.players = players
+        self.initialize_players()
         self.active_player = 0
         self.die = die
+        self.active_die = []
+
+    def initialize_players(self):
+        self.players = []
+        for i in range(self.num_players):
+            self.players.append(Player(i))
+
+    def initialize_hand():
+        pass
 
     def get_turn(self) -> int:
         return self.turn
@@ -56,3 +67,6 @@ def Game():
         self.turn += 1
         self.active_player = (self.active_player + 1) % self.num_players
         self.players[self.active_player].set_hand(Hand(self.die))
+
+    def start_game(self):
+        pass
