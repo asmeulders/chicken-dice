@@ -1,6 +1,7 @@
-from src.game.Dice import Dice, WhiteDice, YellowDice, OrangeDice
-from src.game.Player import Player
-from src.game.Hand import Hand, EmptyHand
+from .Dice import Dice, WhiteDice, YellowDice, OrangeDice
+from .Player import Player
+from .Hand import Hand, EmptyHand
+from Action import Action
 
 def Game():
     """
@@ -109,7 +110,14 @@ def Game():
             self.apply_action(action)
 
     def apply_action(self, action):
-        sides = self.hand.roll()
+        if action == Action.ROLL:
+            sides = self.hand.roll()
+        elif action == Action.PASS:
+            self.end_turn()
+        else:
+            raise ValueError("Invalid action")
+        
+        
         # check sides and apply
 
     def reset_die(self):

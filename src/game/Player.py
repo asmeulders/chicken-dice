@@ -1,5 +1,6 @@
-from src.game.Action import Action
-from src.game.Hand import Hand, EmptyHand
+from .Action import Action
+from .Hand import Hand, EmptyHand
+
 from src.agents.Agent import Agent
 from src.agents.RandomAgent import RandomAgent
 

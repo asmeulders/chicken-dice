@@ -1,6 +1,6 @@
 import random
 
-from Agent import Agent
+from .Agent import Agent
 from src.game.Action import Action
 
 class RandomAgent(Agent):
