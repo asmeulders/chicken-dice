@@ -1,5 +1,5 @@
-from game.Dice import Dice
-from game.Side import Side
+from src.game.Dice import Dice
+from src.game.Side import Side
 
 class Hand():
     def __init__(self, die: list[Dice]) -> None:

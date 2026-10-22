@@ -1,6 +1,6 @@
 import random
 
-from game.Side import Side, EmptySide, EggSide, ChickenSide, FoxSide
+from src.game.Side import Side, EmptySide, EggSide, ChickenSide, FoxSide
 
 
 class Dice:

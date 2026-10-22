@@ -1,13 +1,17 @@
-from game.Action import Action
-from game.Hand import Hand, EmptyHand
+from src.game.Action import Action
+from src.game.Hand import Hand, EmptyHand
+from src.agents.Agent import Agent
+from src.agents.RandomAgent import RandomAgent
 
 class Player():
-    def __init__(self, id: int):
+    def __init__(self, id: int, agent: Agent):
         self.player_id = id
         self.score = 0
         self.hand = EmptyHand()
-        # define agent
-        self.agent = None
+
+        if not isinstance(agent, Agent):
+            raise TypeError("agent must be an Agent object")
+        self.agent = agent
 
     # Accessors
 
@@ -52,7 +56,8 @@ class Player():
 
 
 def main():
-    mia = Player(1)
+    random_agent = RandomAgent()
+    mia = Player(1, random_agent)
     mia.set_score(100)
     print("Test score is ", mia.get_score(), "!")
 

@@ -1,6 +1,6 @@
-from game.Dice import Dice, WhiteDice, YellowDice, OrangeDice
-from game.Player import Player
-from game.Hand import Hand, EmptyHand
+from src.game.Dice import Dice, WhiteDice, YellowDice, OrangeDice
+from src.game.Player import Player
+from src.game.Hand import Hand, EmptyHand
 
 def Game():
     """
