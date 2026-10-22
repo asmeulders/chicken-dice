@@ -27,8 +27,10 @@ def Game():
         self.goal = goal
 
         self.num_players = num_players
+        self.players = []
         self.initialize_players()
         self.active_player = None
+        self.active_player_id = None
         self.die = die
         self.num_die = num_die
         self.num_total_die = len(die) * num_die
@@ -59,7 +61,6 @@ def Game():
     # =================================================================
 
     def initialize_players(self):
-        self.players = []
         for i in range(self.num_players):
             self.players.append(Player(i))
 
@@ -95,6 +96,9 @@ def Game():
         self.reset_die() # resets the rank_dict and initializes the hand
         self.start_turn() # set first active player and give them their hand
 
+        while not self.game_over():
+            action = self.active_player.get_action()
+
     def reset_die(self):
         """
         Reset the rank_dict and initialize the hand.
@@ -109,10 +113,11 @@ def Game():
             self.rank_dict[rank]["num_die"] = 0
 
     def start_turn(self):
-        if not self.active_player:
-            self.active_player = 0
-
-        self.players[self.active_player].set_hand(self.hand)
+        if not self.active_player_id or not self.active_player_id:
+            self.active_player_id = 0
+            
+        self.active_player = self.players[self.active_player_id]
+        self.active_player.set_hand(self.hand)
 
     def end_turn(self):
         self.players[self.active_player].set_hand(EmptyHand)
