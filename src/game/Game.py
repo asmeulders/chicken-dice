@@ -1,6 +1,6 @@
-from Dice import Dice, WhiteDice, YellowDice, OrangeDice
-from Player import Player
-from Hand import Hand, EmptyHand
+from game.Dice import Dice, WhiteDice, YellowDice, OrangeDice
+from game.Player import Player
+from game.Hand import Hand, EmptyHand
 
 def Game():
     """
@@ -23,19 +23,27 @@ def Game():
         num_die = die per unique type
         check die rank for ordering
         """
+
+        # game status
         self.turn = 0
         self.goal = goal
 
+        # players
         self.num_players = num_players
         self.players = []
         self.initialize_players()
+
+        # active player
         self.active_player = None
         self.active_player_id = None
+
+        # dice
         self.die = die
         self.num_die = num_die
         self.num_total_die = len(die) * num_die
         self.initialize_rank_dict(die)
         self.hand = Hand([])
+
 
     # =================================================================
     # ------- Accessors -----------------------------------------------
@@ -98,6 +106,11 @@ def Game():
 
         while not self.game_over():
             action = self.active_player.get_action()
+            self.apply_action(action)
+
+    def apply_action(self, action):
+        sides = self.hand.roll()
+        # check sides and apply
 
     def reset_die(self):
         """
