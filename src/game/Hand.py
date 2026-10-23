@@ -2,50 +2,52 @@ from .Dice import Dice
 from .Side import Side
 
 class Hand():
-    def __init__(self, die: list[Dice]) -> None:
+    def __init__(self, die, num_die=0) -> None:
         self.die = die
+        self.num_die = num_die
+        self.num_total_die = len(die) * num_die
+        self.die_store: dict[int, dict] = self.reset()
+
+    def init_die_store(self, quantities):
+        return {
+            dice.get_rank(): {
+                "num_die": q,
+                "dice": dice
+            } for dice, q in zip(self.die, quantities)
+        }
+
+    def reset(self):
+        quantities = [self.num_die]
+        quantities.extend([0] * (len(self.die) - 1))
+        return self.init_die_store(quantities)
 
     def get_die(self) -> list[Dice]:
         return self.die
 
+    def get_num_total_die(self) -> int:
+        return self.num_total_die
+
+    def get_num_die(self) -> int:
+            return self.num_die
+
     def roll_die(self) -> list[Side]:
         results = []
-        for d in self.die:
-            results.append(d.roll())
+        for die_dict in self.die_store.values():
+            for _ in range(die_dict["num_die"]):
+                results.append(die_dict["dice"].roll())
         return results
 
-    def add_dice(self, dice: Dice) -> bool:
-        """Returns true if dice was added, false if not."""
-        try:
-            self.die.append(dice)
-            return True
-        except ValueError:
-            return False
+    def add_dice(self, dice: Dice) -> None:
+        self.die_store[dice.get_rank()]["num_die"] += 1
 
-    def remove_dice(self, dice: Dice) -> bool:
-        """Returns true if dice was removed, false if not."""
-        try:
-            list.remove(self.die, dice)
-            return True
-        except ValueError:
-            return False
+    def remove_dice(self, dice: Dice) -> None:
+        self.die_store[dice.get_rank()]["num_rnum_dieank"] -= 1
 
     def __len__(self):
-        return len(self.die)
-
-    def __eq__(self, other):
-        if not isinstance(other, Hand):
-            return NotImplemented
-        if len(self) != len(other):
-            return False
-        for i, dice in enumerate(self.die):
-            if not dice == other.get_die()[i]:
-                return False
-            
-        return True
-            
-
-
+        length = 0
+        for dice_data in self.die_store.values():
+            length += dice_data["num_die"]
+        return length
 
 class EmptyHand(Hand):
     def __init__(self):
