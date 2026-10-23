@@ -57,6 +57,9 @@ class Dice:
             raise NotImplemented
 
         return self.num_sides == other.get_num_sides() and self.sides == other.get_sides()
+
+    def __str__(self):
+        return f"Dice: {self.sides} out of {self.num_sides}"
         
 class WhiteDice(Dice):
     def __init__(self) -> None:
@@ -66,6 +69,9 @@ class WhiteDice(Dice):
 
         super().__init__(num_sides=6, chicken=chicken, foxes=foxes, eggs=eggs, rank=0)
 
+    def __str__(self):
+        return "White Dice"
+
 class YellowDice(Dice):
     def __init__(self) -> None:
         chicken = [1, 1, 1]
@@ -74,6 +80,9 @@ class YellowDice(Dice):
 
         super().__init__(num_sides=6, chicken=chicken, foxes=foxes, eggs=eggs, rank=1)
 
+    def __str__(self):
+        return "Yellow Dice"
+
 class OrangeDice(Dice):
     def __init__(self) -> None:
         chicken = [2, 1]
@@ -81,3 +90,6 @@ class OrangeDice(Dice):
         foxes = [1, 1]
 
         super().__init__(num_sides=6, chicken=chicken, foxes=foxes, eggs=eggs, rank=2)
+
+    def __str__(self):
+        return "Orange Dice"

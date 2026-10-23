@@ -1,5 +1,5 @@
 from .Action import Action
-from .Hand import Hand, EmptyHand
+from .Hand import Hand
 
 from src.agents.Agent import Agent
 from src.agents.RandomAgent import RandomAgent
@@ -8,7 +8,6 @@ class Player():
     def __init__(self, id: int, agent: Agent):
         self.player_id = id
         self.score = 0
-        self.hand = EmptyHand()
 
         if not isinstance(agent, Agent):
             raise TypeError("agent must be an Agent object")
@@ -22,8 +21,6 @@ class Player():
     def get_score(self) -> int:
         return self.score
 
-    def get_hand(self) -> Hand:
-        return self.hand
 
     def set_hand(self, hand) -> None:
         self.hand = hand

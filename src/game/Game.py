@@ -1,6 +1,6 @@
 from .Dice import Dice, WhiteDice, YellowDice, OrangeDice
 from .Player import Player
-from .Hand import Hand, EmptyHand
+from .Hand import Hand
 from .Action import Action
 from .Side import SideValues
 
@@ -60,6 +60,7 @@ class Game():
 
         # dice
         self.dice_pile: list[Dice] = []
+        print("die 1", die)
         self.hand = Hand(die, num_die)
         print("Made game")
 
@@ -116,24 +117,31 @@ class Game():
         while not self.game_over():
             action = self.players[self.active_player_id].get_action()
             print(f"Player {self.active_player_id}: {"Roll" if action == Action.ROLL else "Pass"}")
+            print("action", action)
             self.apply_action(action)
 
         # clean up
 
     def apply_action(self, action):
-        if action == Action.ROLL:
-            sides = self.hand.roll_die()
-            for s in sides:
-                if s.get_value() == SideValues.CHICKEN:
+        if action is Action.ROLL:
+            print("here")
+            results = self.hand.roll_die()
+            print(len(results))
+            for d, s in results:
+                print("val", s.get_value())
+                if s.get_value() is SideValues.CHICKEN:
                     self.current_points += s.get_quantity()
-
-                elif s.get_value() == SideValues.EGG:
+                    print("rolled", self.current_points)
+                    self.hand.deactivate_dice(d)
+                elif s.get_value() is SideValues.EGG:
                     self.do_egg_action(s.get_quantity())
-                elif s.get_value() == SideValues.FOX:
+                    print("egged")
+                elif s.get_value() is SideValues.FOX:
                     self.current_fox += s.get_quantity()
+                    self.hand.deactivate_dice(d)
+                    print("foxed")
 
-
-        elif action == Action.PASS:
+        elif action is Action.PASS:
             self.end_turn(is_foxed=False)
 
         else:
@@ -141,6 +149,9 @@ class Game():
 
         if self.current_fox >= self.fox_limit:
             self.end_turn(is_foxed=True)
+
+        if len(self.hand) <= 0:
+            self.end_turn(is_foxed=False)
 
     def do_egg_action(self, quantity):
         while len(self.dice_pile) > 0 and quantity > 0:
@@ -156,14 +167,12 @@ class Game():
         # self.initialize_hand()
         self.reset_dice_pile()
 
-    def reset_dice_pile(self) -> list[Dice]:
+    def reset_dice_pile(self) -> None:
         if len(self.hand.get_die()) <= 1:
-            return self.dice_pile
+            return
         for dice in self.hand.get_die()[1:]:
             for _ in range(self.hand.get_num_die()): # only thing here
-                self.dice_pile.append(dice)
-        return self.dice_pile
-        
+                self.dice_pile.append(dice)  
 
     def end_turn(self, is_foxed):
         assert isinstance(self.active_player_id, int)
@@ -172,14 +181,13 @@ class Game():
         if is_foxed:
             self.reset_all_die()
         else:
+            self.hand.reset_inactive_die()
             self.players[self.active_player_id].add_points(self.current_points)
 
         self.current_points = 0
         self.current_fox = 0
-        self.players[self.active_player_id].set_hand(EmptyHand)
         self.turn += 1
         self.active_player_id = (self.active_player_id + 1) % self.num_players
-        self.players[self.active_player_id].set_hand(self.hand)
         
 
     def game_over(self) -> bool:
