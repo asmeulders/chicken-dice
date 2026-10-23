@@ -35,16 +35,15 @@ class Game():
             raise TypeError("Goal must be an int")
         if goal < 1:
             raise ValueError("Goal but be at least one")
-        self.goal = goal
+        self.goal: int = goal
         if not isinstance(fox_limit, int):
             raise TypeError("Fox limit must be an int")
         if fox_limit < 1:
             raise ValueError("Fox limit but be at least one")
-        self.fox_limit = fox_limit
-        self.current_points = 0
-        self.current_fox = 0
-        self.turn = 0
-        
+        self.fox_limit: int = fox_limit
+        self.current_points: int = 0
+        self.current_fox: int = 0
+        self.turn: int = 0
 
         # players
         if not isinstance(agents, list):
@@ -52,17 +51,17 @@ class Game():
         if len(agents) < 2:
             raise ValueError("Need at least 2 players")
 
-        self.num_players = len(agents)
-        self.players = []
+        self.num_players: int = len(agents)
+        self.players: list[Player] = []
         self.initialize_players(agents)
 
         # active player
         self.active_player = None
-        self.active_player_id = None
+        self.active_player_id: int = -1
 
         # dice
         self.die = die
-        self.dice_pile = []
+        self.dice_pile: list[Dice] = []
         self.num_die = num_die
         self.num_total_die = len(die) * num_die
         self.initialize_rank_dict(die)
@@ -123,7 +122,6 @@ class Game():
                 if not self.hand.add_dice(self.rank_dict[rank]["dice"]):
                     raise Exception("Dice was not added")
 
-        
 
     # =================================================================
     # ------- Game Functions ------------------------------------------
@@ -131,15 +129,18 @@ class Game():
 
     def start_game(self):
         print("Start game")
-        self.reset_die() # resets the rank_dict and initializes the hand
+        self.reset_all_die() # resets the rank_dict and initializes the hand
         self.start_turn() # set first active player and give them their hand
 
         assert isinstance(self.active_player, Player)
 
+        # game loop
         while not self.game_over():
             action = self.active_player.get_action()
             print(f"Player {self.active_player_id}: {"Roll" if action == Action.ROLL else "Pass"}")
             self.apply_action(action)
+
+        # clean up
 
     def apply_action(self, action):
         if action == Action.ROLL:
@@ -149,19 +150,25 @@ class Game():
                     assert isinstance(self.active_player, Player) # figure out how to get types without assert
                     self.current_points += s.get_quantity()
                 elif s.get_value() == SideValues.EGG:
-                    self.hand.add_dice(self.dice_pile.pop())
+                    self.do_egg_action()
                 elif s.get_value() == SideValues.FOX:
                     self.current_fox += s.get_quantity()
 
         elif action == Action.PASS:
             self.end_turn(is_foxed=False)
+
         else:
             raise ValueError("Invalid action")
 
         if self.current_fox >= self.fox_limit:
             self.end_turn(is_foxed=True)
+
+    def do_egg_action(self):
+        dice = self.dice_pile.pop()
+        self.hand.add_dice(dice)
+        self.rank_dict[dice.get_rank()]["num_die"] += 1
         
-    def reset_die(self):
+    def reset_all_die(self):
         """
         Reset the rank_dict, initialize the hand, and reset dice pile.
         """
@@ -184,7 +191,7 @@ class Game():
         return self.die
 
     def start_turn(self):
-        if not self.active_player_id or not self.active_player_id:
+        if self.active_player_id == -1 or not self.active_player_id:
             self.active_player_id = 0
 
         print("Start turn", self.active_player_id)            
@@ -196,8 +203,11 @@ class Game():
         assert isinstance(self.active_player_id, int)
         print(f"End turn {self.turn} for player {self.active_player_id}")
 
-        if not is_foxed:
+        if is_foxed:
+            self.reset_all_die()
+        else:
             self.active_player.add_points(self.current_points)
+
         self.current_points = 0
         self.current_fox = 0
         self.active_player.set_hand(EmptyHand)
@@ -217,9 +227,12 @@ class Game():
 def main():
     agents = [RandomAgent(), RandomAgent(), DummyAgent()]
     die = [WhiteDice(), YellowDice(), OrangeDice()]
-    game = Game(goal=25, agents=agents, die=die, num_die=4)
+    game = Game(goal=25, agents=agents, die=die, num_die=4, fox_limit=3)
 
     game.start_game()
+
+    for player in game.get_players():
+        print(f"Player {player.get_player_id()} Score: {player.get_score()}")
 
 if __name__ == "__main__":
     main()
